@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thuật Toán FFT (Fast Fourier Transform)</title>
+
+  <!-- Font Awesome & MathJax -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Link CSS riêng -->
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+  <header>
+    <h1><i class="fa-solid fa-wave-square"></i> Fast Fourier Transform (FFT)</h1>
+    <p>Giải thích, công thức và ví dụ minh họa</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>1️⃣ Giới thiệu</h2>
+      <p>
+        FFT (Fast Fourier Transform) là thuật toán giúp tính nhanh biến đổi Fourier rời rạc (DFT).
+        Nó được ứng dụng rộng rãi trong xử lý tín hiệu, âm thanh, hình ảnh và các bài toán khoa học máy tính.
+      </p>
+      <div class="formula">
+        Biến đổi Fourier rời rạc được định nghĩa là:
+        \[
+        X_k = \sum_{n=0}^{N-1} x_n \cdot e^{-2\pi i \frac{kn}{N}}, \quad k = 0, 1, \ldots, N-1
+        \]
+      </div>
+    </section>
+
+    <section>
+      <h2>2️⃣ Ý tưởng chính</h2>
+      <p>
+        FFT tận dụng tính chất đối xứng và tuần hoàn của số mũ phức để giảm độ phức tạp từ \( O(N^2) \) xuống \( O(N \log N) \).
+      </p>
+      <div class="formula">
+        Ta tách tín hiệu \( x_n \) thành hai phần: chỉ số chẵn và chỉ số lẻ:
+        \[
+        X_k = E_k + e^{-2\pi i \frac{k}{N}} O_k
+        \]
+        trong đó \( E_k \) là DFT của phần chẵn, \( O_k \) là DFT của phần lẻ.
+      </div>
+    </section>
+
+    <section>
+      <h2>3️⃣ Mã nguồn minh họa (Python)</h2>
+      <pre><code class="language-python">
+import cmath
+
+def fft(a):
+    n = len(a)
+    if n == 1:
+        return a
+    w_n = cmath.exp(2j * cmath.pi / n)
+    w = 1
+    a_even = fft(a[0::2])
+    a_odd = fft(a[1::2])
+    y = [0] * n
+    for k in range(n // 2):
+        t = w * a_odd[k]
+        y[k] = a_even[k] + t
+        y[k + n//2] = a_even[k] - t
+        w *= w_n
+    return y
+      </code></pre>
+    </section>
+
+    <section>
+      <h2>4️⃣ Ví dụ minh họa</h2>
+      <div class="example">
+        Giả sử ta có tín hiệu rời rạc:
+        \[
+        x = [1, 2, 3, 4]
+        \]
+        Khi thực hiện FFT, ta thu được phổ tần số:
+        \[
+        X = [10, -2+2j, -2, -2-2j]
+        \]
+      </div>
+    </section>
+
+    <section>
+      <h2>5️⃣ Ứng dụng thực tế</h2>
+      <ul>
+        <li>Phân tích âm thanh và nhạc số 🎵</li>
+        <li>Xử lý ảnh (lọc nhiễu, nén ảnh)</li>
+        <li>Phân tích tín hiệu radar, y tế (ECG, EEG)</li>
+        <li>Biểu diễn đa thức trong tính toán nhanh</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6️⃣ Ứng dụng trong Competitive Programming 💻</h2>
+      <p>
+        FFT là một trong những công cụ mạnh mẽ nhất trong lập trình thi đấu, đặc biệt khi cần xử lý các phép nhân hoặc chập (convolution)
+        của hai mảng hoặc đa thức có kích thước lớn.
+      </p>
+
+      <h3>🔹 Bài toán thường gặp</h3>
+      <ul>
+        <li><b>Nhân đa thức:</b> Cho hai đa thức \( A(x) \) và \( B(x) \), hãy tính \( C(x) = A(x) \times B(x) \).</li>
+        <li><b>Đếm số cặp có tổng bằng giá trị cho trước:</b> Biến đổi mảng tần suất bằng FFT để nhân chập, lấy kết quả tổng hợp nhanh.</li>
+        <li><b>Bài toán xác suất hoặc tổ hợp lớn:</b> Tính tích của nhiều phân phối xác suất, hoặc gộp kết quả DP thông qua convolution.</li>
+      </ul>
+
+      <h3>🔹 Tại sao cần FFT?</h3>
+      <p>
+        Nếu nhân hai đa thức bậc \( N \) bằng cách thông thường, độ phức tạp là \( O(N^2) \).  
+        FFT giúp thực hiện phép nhân này trong \( O(N \log N) \) nhờ ý tưởng:
+      </p>
+      <ol>
+        <li>Đưa đa thức sang miền tần số (Fourier space).</li>
+        <li>Nhân từng giá trị tương ứng (thay vì chập chéo phức tạp).</li>
+        <li>Biến đổi ngược (Inverse FFT) để thu lại kết quả trong miền thời gian.</li>
+      </ol>
+
+      <div class="formula">
+        Ví dụ:
+        \[
+        C(x) = A(x) \times B(x)
+        \quad \Rightarrow \quad
+        \text{FFT}(C) = \text{FFT}(A) \cdot \text{FFT}(B)
+        \]
+      </div>
+
+      <h3>🔹 Bài toán nổi bật sử dụng FFT</h3>
+      <ul>
+        <li><b>Codeforces 438D – The Child and Sequence</b> (tối ưu hóa phép nhân dãy lớn).</li>
+        <li><b>Polynomial Multiplication</b> trong các đề ICPC, AtCoder, CSES.</li>
+        <li><b>Substring Matching nâng cao:</b> Biến đổi ký tự thành số và dùng FFT để so khớp nhanh.</li>
+      </ul>
+
+      <p>
+        Tóm lại, FFT giúp “nhân nhanh” những thứ tưởng chừng không thể — 
+        và là mảnh ghép không thể thiếu khi giải các bài toán liên quan tới tổ hợp, xác suất, hoặc xử lý tín hiệu trong competitive programming ⚡
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 FFT Learning Page – Thiết kế bởi <b>Lê Nam Khánh</b>
+  </footer>
+
+  <!-- JS riêng -->
+  <script src="./js/main.js"></script>
+</body>
+</html>
